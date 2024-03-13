@@ -1,0 +1,25 @@
+{
+  "name": "mdeditor",
+  "version": "0.0.0",
+  "description": "Simple markdown editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sbcguard/mdEditor.git"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "mark",
+    "down"
+  ],
+  "author": "AJ Rugen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sbcguard/mdEditor/issues"
+  },
+  "homepage": "https://github.com/sbcguard/mdEditor#readme"
+}
