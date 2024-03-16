@@ -1,115 +1,15 @@
 //mdEditor.js
-//AJ Rugen
-//Boone County IT
+//sbcguard
 //Enabled by setting the target element (textarea) with the attribute data-mdeditor="true"
 'use strict';
 // Custom Error Handler
-const throwError = (err, custMsg) => {
-  // On any error, disable all forms to prevent bad emails from being sent
-  Array.from(document.querySelectorAll('form')).forEach((form) => {
-    Array.from(form.elements).forEach((el) => el?.name !== 'btn_back' && (el.disabled = true));
-  });
-  if (err instanceof Error) {
-    // Basic error message
-    if (custMsg && typeof custMsg === 'string') {
-      // Provides a more specific error message
-      throw new Error(`${custMsg} ${err.message}`);
-    } else {
-      // Rethrow the error to propagate it further if needed
-      throw err;
-    }
-  } else if (typeof err === 'string') {
-    throw new Error(err);
-  } else {
-    // Error handling for error handling
-    throw new Error('Invalid error message');
-  }
-};
 const mdEditor = new (function () {
   //Constants/Variables
   const self = this;
-  const bcURLs = [
-    'showmeboone.com',
-    'boonecountymo.org',
-    'cavewatershed.org',
-    'helpthehinkson.org',
-    'boonemo.org',
-    'boone.gov',
-    'arcg.is',
-    'surveymonkey.com',
-  ];
+  const bcURLs = allowedUrls;
   let md_area = undefined,
     body_div = undefined,
     body_max_length = 0;
-  // Ctrl+Key shortcut keys for text editing
-  self.shortcutKeys = {
-    Z: 'undo',
-    Y: 'redo',
-    B: 'bold',
-    I: 'italic',
-    U: 'underline',
-    S: 'strikeThrough',
-    H: 'subscript',
-    G: 'superscript',
-    Q: 'removeFormat',
-    O: 'outdent',
-    M: 'indent',
-    L: 'justifyLeft',
-    E: 'justifyCenter',
-    R: 'justifyRight',
-    J: 'justifyFull',
-    K: 'createLink',
-    D: 'unlink',
-  };
-  // Capture and process keyboard shortcuts such as Ctrl+B, Ctrl+I, Ctrl+L
-  self.captureShortcut = (ev) => {
-    try {
-      const key = String.fromCharCode(ev.keyCode).toUpperCase();
-      if (ev.ctrlKey && self.shortcutKeys[key] !== undefined) {
-        // Execute the shortcut
-        self.executeFormatCommand(self.shortcutKeys[key]);
-        // A special key was captured, so prevent the default behavior
-        ev.preventDefault();
-        ev.stopPropagation();
-      }
-    } catch (error) {
-      throwError(error, 'Error in captureShortcut:');
-    }
-  };
-  // Formats selected text based on the passed command
-  self.executeFormatCommand = (command) => {
-    try {
-      if (command.toLowerCase() == 'createlink') {
-        // Preserve text selection so link can be applied correctly
-        if (window.getSelection().rangeCount > 0) {
-          let dialogRange = window.getSelection().getRangeAt(0);
-          // Open dialog to prompt for link
-          let urlLink = prompt('Enter the URL of the link:', 'https://');
-          if (checkURL(urlLink)) {
-            if (urlLink.substring(0, 8) == 'https://') {
-              let selection = window.getSelection();
-              selection.removeAllRanges();
-              selection.addRange(dialogRange);
-              document.execCommand('createLink', false, urlLink);
-            } else {
-              alert(`Link must begin with "https://"`);
-            }
-          } else {
-            alert(`Link must be to an allowed URL: \r\n${bcURLs.join('\r\n')}`);
-          }
-        } else {
-          alert(
-            "A selection must be made before creating a link. High the text to add a link to and click the 'Create Link' button again."
-          );
-        }
-      } else {
-        document.execCommand(command, false, null);
-      }
-      return self;
-    } catch (error) {
-      throwError(error, 'Error in executeFormatCommand:');
-    }
-  };
   // Ensure body contents are updated when editable div is updated
   self.updateBodyContents = () => {
     try {
@@ -166,41 +66,16 @@ const mdEditor = new (function () {
       throwError(error, 'Error in removeCounterElement:');
     }
   };
-  self.getCounterElement = (el) => {
-    try {
-      let target = document.querySelector(`[data-counter-for="${el.id || el.name}"]`);
-      if (!target) {
-        // Create a span for this message
-        target = document.createElement('span');
-        target.className = `counter-for-${md_area.name}`;
-        target.setAttribute('data-counter-for', el.id || el.name);
-        el.parentElement.insertBefore(target, el.nextSibling);
-      }
-      return target;
-    } catch (error) {
-      throwError(error, 'Error in getCounterElement:');
-    }
-  };
-  const counterEvent = (ev) => {
-    try {
-      const el = self.getCounterElement(ev.currentTarget);
-      const maxcount = ev.currentTarget.getAttribute('data-count');
-      const newValue = ev.currentTarget.value.slice(0, parseInt(maxcount));
-      // Enforce the max length
-      if (ev.currentTarget.value != newValue) {
-        ev.currentTarget.value = newValue;
-      }
-      el.textContent = ev.currentTarget.value.length + '/' + maxcount;
-    } catch (error) {
-      throwError(error, 'Error in counterEvent:');
-    }
-  };
   // Set up the form when the DOM finishes loading
   const initialize = async () => {
     try {
       //Append After form element
       md_area = document.querySelector('[data-mdeditor="true"]');
       if (!md_area) return;
+      if (md_area.tagName.toLowerCase() !== 'textarea')
+        throwError(
+          `Mark down editor can only be used with a <textarea> element, was applied to <${md_area.tagName.toLowerCase()}>. Check implementation.`,
+        );
       const parentContainer = md_area.parentElement;
       //Set md_editor field length
       await setBodyMaxLength(md_area);
@@ -221,14 +96,14 @@ const mdEditor = new (function () {
       md_area.form.addEventListener('submit', self.updateBodyContents);
       // Formatting bar
       Array.from(
-        document.querySelectorAll('.formatting-bar button[data-formatting-exec-command]')
+        document.querySelectorAll('.formatting-bar button[data-formatting-exec-command]'),
       ).forEach((el) => {
         el.addEventListener('click', (e) => {
           self.executeFormatCommand(e.currentTarget.getAttribute('data-formatting-exec-command'));
         });
       });
       Array.from(
-        document.querySelectorAll('.formatting-bar select[data-formatting-exec-command]')
+        document.querySelectorAll('.formatting-bar select[data-formatting-exec-command]'),
       ).forEach((el) => {
         el.addEventListener('change', (e) => {
           const { currentTarget: targ } = e;
@@ -255,7 +130,7 @@ const mdEditor = new (function () {
   const setBodyMaxLength = async (md_el) => {
     try {
       //Hooks into native mPower textarea onkeypress attribute to obtain field length dynamically.
-      const keyPressValue = md_el.onkeypress.toString();
+      const keyPressValue = md_el?.onkeypress?.toString() || '(null,10000)';
       const startIndex = keyPressValue.indexOf(',');
       const endIndex = keyPressValue.lastIndexOf(')');
       const fldLength = keyPressValue.substring(startIndex + 1, endIndex);
@@ -318,31 +193,63 @@ const mdEditor = new (function () {
       const targElName = document.querySelector('[data-mdeditor="true"]').name;
       const styleEl = document.createElement('style');
       styleEl.innerHTML = `.formatting-bar {
-                                        margin-bottom: 5px;
-                                        display: flex;
-                                        justify-content: space-evenly;
-                                    }
-                                    .${targElName} {
-                                        background-color: #fff;
-                                        border-radius: 4px;
-                                        border-style: solid;
-                                        border-width: 1px;
-                                        border-color: #ccc;
-                                        overflow: hidden;
-                                        width: 100%;
-                                        white-space: pre-wrap;
-                                    }
-                                    .body-content {
-                                    min-height: 250px;
-                                    }
-                                    .counter-for-${targElName} {
-                                        background-color: #E7E7E7;
-                                        padding: 5px;
-                                        border: 1px solid #A9A9A9;
-                                        font-size: 0.875rem /* 14px */;
-                                        display: inline-block;
-                                    }
-                                    `;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-evenly;
+}
+.${targElName} {
+    background-color: #fff;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    overflow: hidden;
+    width: 100%;
+    white-space: pre-wrap;
+}
+.body-content {
+min-height: 250px;
+background-color: white;
+}
+.counter-for-${targElName} {
+    background-color: #E7E7E7;
+    padding: 5px;
+    border: 1px solid #A9A9A9;
+    font-size: 0.875rem /* 14px */;
+    display: inline-block;
+}
+.md-dialog {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  border: 1px solid orange;
+  background-color: white;
+  padding: 1rem;
+  margin: 0.5rem;
+  text-align: center;
+  width: 40rem;
+  max-height: 90vh;
+  z-index: 10;
+  position: fixed;
+  top: 7.5vh;
+  overflow: auto;
+  left: calc(50% - 20rem);
+}
+.md-dialog button {
+  margin-right: 1rem;
+}
+.md-dialog-container { 
+  margin-bottom: 1rem;
+}
+.md-backdrop {
+  position: fixed;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.75);
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+`;
       document.head.appendChild(styleEl);
     } catch (error) {
       throwError(error, 'Error in buildStyles:');

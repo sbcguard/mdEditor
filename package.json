@@ -6,7 +6,10 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
+    "build": "npm run format && tsup",
+    "format": "prettier --write .",
+    "publish": "npm publish",
+    "save-all": "npm run format && git add . && git commit -m \"autosave\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,7 +29,16 @@
   },
   "homepage": "https://github.com/sbcguard/mdEditor#readme",
   "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.2"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "printWidth": 100,
+    "semi": true,
+    "singleQuote": true
   }
 }
