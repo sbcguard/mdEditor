@@ -1,14 +1,17 @@
 {
   "name": "mdeditor",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Simple markdown editor",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsup",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sbcguard/mdEditor.git"
+    "url": "https://github.com/sbcguard/mdEditor"
   },
   "keywords": [
     "markdown",
@@ -16,10 +19,14 @@
     "mark",
     "down"
   ],
-  "author": "AJ Rugen",
+  "author": "sbcguard",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sbcguard/mdEditor/issues"
   },
-  "homepage": "https://github.com/sbcguard/mdEditor#readme"
+  "homepage": "https://github.com/sbcguard/mdEditor#readme",
+  "devDependencies": {
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.2"
+  }
 }
