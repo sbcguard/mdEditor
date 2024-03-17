@@ -12,3 +12,7 @@ export type FormInputAndControlElements =
 export type SelectionType = Selection | null;
 //store.ts types
 export type ShortcutKeys = { [key: string]: string };
+export type MarkDownObject = {
+  parent: HTMLElement;
+  bodyLength: number;
+};

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="module" src="http://192.168.80.1:8080/dist/umd/index.js" defer></script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 97%;
+        height: 100%;
+        font-family: sans-serif;
+        padding: 1rem;
+        background: #ccc;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        margin-left: 5%;
+      }
+      textarea {
+        align-self: center;
+        width: 90%;
+        height: 80vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="formContainer">
+      <form>
+        <div>
+          <textarea
+            name="markdown"
+            data-mdeditor="true"
+            id="mdEditor"
+            cols="30"
+            rows="30"
+            maxlength="10000"
+          ></textarea>
+          <!-- <input
+            type="text"
+            data-mdeditor="true"
+            name="markdownbad"
+            value=""
+            placeholder="bad markdown element"
+          /> -->
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

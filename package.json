@@ -4,9 +4,10 @@
   "description": "Simple markdown editor",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
+  "type": "module",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "npm run format && tsup",
+    "build": "npm run format && npx rollup -c",
     "format": "prettier --write .",
     "publish": "npm publish",
     "save-all": "npm run format && git add . && git commit -m \"autosave\"",
@@ -29,9 +30,15 @@
   },
   "homepage": "https://github.com/sbcguard/mdEditor#readme",
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^20.11.28",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "tsup": "^8.0.2",
+    "rollup": "^4.13.0",
     "typescript": "^5.4.2"
   },
   "prettier": {
@@ -40,5 +47,8 @@
     "printWidth": 100,
     "semi": true,
     "singleQuote": true
+  },
+  "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.5.1"
   }
 }

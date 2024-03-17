@@ -1,5 +1,25 @@
 import { ErrorProps, FormInputAndControlElements, SelectionType } from './types';
 import { shortcutKeys, allowedUrls } from './store';
+import {
+  faUndo,
+  faRedo,
+  faBold,
+  faItalic,
+  faUnderline,
+  faStrikethrough,
+  faSubscript,
+  faSuperscript,
+  faRemoveFormat,
+  faOutdent,
+  faIndent,
+  faAlignJustify,
+  faAlignLeft,
+  faAlignCenter,
+  faAlignRight,
+  faLink,
+  faUnlink,
+  IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
 export const throwError = ({ err, msg }: ErrorProps) => {
   // On any error, disable all forms to prevent bad emails from being sent
   const forms = document.querySelectorAll<HTMLFormElement>('form');
@@ -68,6 +88,67 @@ export const executeFormatCommand = async (command: string) => {
     }
   } catch (error: any) {
     throwError({ err: error, msg: 'Error in executeFormatCommand:' });
+  }
+};
+export const setBodyMaxLength = (el: HTMLTextAreaElement): number => {
+  try {
+    //Hooks into native HTML textarea maxlength attribute to obtain field length, default to 10,000.
+    const maxlength = el.maxLength || 10000;
+    if (!(el.maxLength > 0)) {
+      console.warn(el, ': missing maxlength attribute, defaulting to 10000 allowed characters');
+    }
+    return maxlength;
+  } catch (error: any) {
+    throwError({ err: error, msg: 'Error in setBodyMaxLength:' });
+  }
+  return 0;
+};
+export const buildFormattingBar = (parent: HTMLElement, el: HTMLTextAreaElement) => {
+  try {
+    if (!parent) throw new Error('Failed to init format bar, no container element provided.');
+    hide(el);
+    const fBarContainer = document.createElement('div');
+    const newTextarea = document.createElement('div');
+    fBarContainer.classList.add('formatting-bar');
+    const fBarContainerHTML = `
+    <div class="input-group do-controls">
+      ${createFormatButton('undo', 'Undo (Ctrl+Z)', faUndo)}
+      ${createFormatButton('redo', 'Redo (Ctrl+Y)', faRedo)}        
+    </div>
+    <div class="input-group font-controls">
+      ${createFormatButton('bold', 'Bold (Ctrl+B)', faBold)}
+      ${createFormatButton('italic', 'Italicize (Ctrl+I)', faItalic)}        
+      ${createFormatButton('underline', 'Underline (Ctrl+U)', faUnderline)}
+      </div>
+      <div class="input-group script-controls">
+      ${createFormatButton('strikeThrough', 'Strikethrough (Ctrl+S)', faStrikethrough)}
+      ${createFormatButton('subscript', 'Subscript (Ctrl+H)', faSubscript)}        
+      ${createFormatButton('superscript', 'Superscript (Ctrl+G)', faSuperscript)}
+      ${createFormatButton('removeFormat', 'Remove formatting (Ctrl+Q)', faRemoveFormat)}
+      </div>
+      <div class="input-group dent-controls">
+      ${createFormatButton('outdent', 'Outdent (Ctrl+O)', faOutdent)}
+      ${createFormatButton('indent', 'Indent (Ctrl+M)', faIndent)}
+      </div>
+      <div class="input-group justification-controls">
+      ${createFormatButton('justifyLeft', 'Left align (Ctrl+L)', faAlignLeft)}
+      ${createFormatButton('justifyCenter', 'Center (Ctrl+E)', faAlignCenter)}
+      ${createFormatButton('justifyRight', 'Right align (Ctrl+R)', faAlignRight)}
+      ${createFormatButton('justifyFull', 'Justify (Ctrl+J)', faAlignJustify)}
+      </div>
+      <div class="input-group link-controls">
+      ${createFormatButton('createLink', 'Create link (Ctrl+K)', faLink)}
+      ${createFormatButton('unlink', 'Unlink (Ctrl+D)', faUnlink)}
+    </div>`;
+    fBarContainer.innerHTML = fBarContainerHTML;
+    newTextarea.classList.add('body-content');
+    newTextarea.classList.add(el.name);
+    newTextarea.contentEditable = 'true';
+    newTextarea.spellcheck = true;
+    parent.insertBefore(fBarContainer, el);
+    parent.insertBefore(newTextarea, el);
+  } catch (error: any) {
+    throwError({ err: error, msg: 'Error in buildFormattingBar:' });
   }
 };
 const createDialog = async (): Promise<string> => {
@@ -178,4 +259,11 @@ const getCounterElement = (el: HTMLTextAreaElement) => {
   } catch (error: any) {
     throwError({ err: error, msg: 'Error in getCounterElement:' });
   }
+};
+const createFormatButton = (dataFormat: string, title: string, icon: IconDefinition) =>
+  `<button class="input-group-addon input-group-btn"
+                data-formatting-exec-command="${dataFormat}" tabindex="-1" title="${title}" type="button"><i class="fa ${icon.iconName}></i></button>`;
+const hide = (el: HTMLElement) => {
+  el.style.display = 'none';
+  el.style.visibility = 'hidden';
 };
