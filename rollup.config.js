@@ -17,7 +17,7 @@ export default {
       sourcemap: false,
     },
     {
-      name: 'MyLibrary', // UMD name
+      name: 'mdEditor', // UMD name
       file: 'dist/umd/index.js',
       format: 'umd', // UMD format
       sourcemap: false,

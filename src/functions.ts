@@ -1,25 +1,24 @@
 import { ErrorProps, FormInputAndControlElements, SelectionType } from './types';
 import { shortcutKeys, allowedUrls } from './store';
 import {
-  faUndo,
-  faRedo,
-  faBold,
-  faItalic,
-  faUnderline,
-  faStrikethrough,
-  faSubscript,
-  faSuperscript,
-  faRemoveFormat,
-  faOutdent,
-  faIndent,
-  faAlignJustify,
-  faAlignLeft,
-  faAlignCenter,
-  faAlignRight,
-  faLink,
-  faUnlink,
-  IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+  undo,
+  redo,
+  bold,
+  italic,
+  underline,
+  strikethrough,
+  subscript,
+  superscript,
+  removeFormat,
+  outdent,
+  indent,
+  alignJustify,
+  alignLeft,
+  alignCenter,
+  alignRight,
+  link,
+  unlink,
+} from './icons'; //'@fortawesome/free-solid-svg-icons';
 export const throwError = ({ err, msg }: ErrorProps) => {
   // On any error, disable all forms to prevent bad emails from being sent
   const forms = document.querySelectorAll<HTMLFormElement>('form');
@@ -110,35 +109,38 @@ export const buildFormattingBar = (parent: HTMLElement, el: HTMLTextAreaElement)
     const fBarContainer = document.createElement('div');
     const newTextarea = document.createElement('div');
     fBarContainer.classList.add('formatting-bar');
+    fBarContainer.style.display = 'flex';
+    fBarContainer.style.justifyContent = 'space-evenly';
+    fBarContainer.style.alignItems = 'center';
     const fBarContainerHTML = `
-    <div class="input-group do-controls">
-      ${createFormatButton('undo', 'Undo (Ctrl+Z)', faUndo)}
-      ${createFormatButton('redo', 'Redo (Ctrl+Y)', faRedo)}        
+    <div class="input-group do-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('undo', 'Undo (Ctrl+Z)', undo)}
+      ${createFormatButton('redo', 'Redo (Ctrl+Y)', redo)}        
     </div>
-    <div class="input-group font-controls">
-      ${createFormatButton('bold', 'Bold (Ctrl+B)', faBold)}
-      ${createFormatButton('italic', 'Italicize (Ctrl+I)', faItalic)}        
-      ${createFormatButton('underline', 'Underline (Ctrl+U)', faUnderline)}
+    <div class="input-group font-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('bold', 'Bold (Ctrl+B)', bold)}
+      ${createFormatButton('italic', 'Italicize (Ctrl+I)', italic)}        
+      ${createFormatButton('underline', 'Underline (Ctrl+U)', underline)}
       </div>
-      <div class="input-group script-controls">
-      ${createFormatButton('strikeThrough', 'Strikethrough (Ctrl+S)', faStrikethrough)}
-      ${createFormatButton('subscript', 'Subscript (Ctrl+H)', faSubscript)}        
-      ${createFormatButton('superscript', 'Superscript (Ctrl+G)', faSuperscript)}
-      ${createFormatButton('removeFormat', 'Remove formatting (Ctrl+Q)', faRemoveFormat)}
+      <div class="input-group script-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('strikeThrough', 'Strikethrough (Ctrl+S)', strikethrough)}
+      ${createFormatButton('subscript', 'Subscript (Ctrl+H)', subscript)}        
+      ${createFormatButton('superscript', 'Superscript (Ctrl+G)', superscript)}
+      ${createFormatButton('removeFormat', 'Remove formatting (Ctrl+Q)', removeFormat)}
       </div>
-      <div class="input-group dent-controls">
-      ${createFormatButton('outdent', 'Outdent (Ctrl+O)', faOutdent)}
-      ${createFormatButton('indent', 'Indent (Ctrl+M)', faIndent)}
+      <div class="input-group dent-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('outdent', 'Outdent (Ctrl+O)', outdent)}
+      ${createFormatButton('indent', 'Indent (Ctrl+M)', indent)}
       </div>
-      <div class="input-group justification-controls">
-      ${createFormatButton('justifyLeft', 'Left align (Ctrl+L)', faAlignLeft)}
-      ${createFormatButton('justifyCenter', 'Center (Ctrl+E)', faAlignCenter)}
-      ${createFormatButton('justifyRight', 'Right align (Ctrl+R)', faAlignRight)}
-      ${createFormatButton('justifyFull', 'Justify (Ctrl+J)', faAlignJustify)}
+      <div class="input-group justification-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('justifyLeft', 'Left align (Ctrl+L)', alignLeft)}
+      ${createFormatButton('justifyCenter', 'Center (Ctrl+E)', alignCenter)}
+      ${createFormatButton('justifyRight', 'Right align (Ctrl+R)', alignRight)}
+      ${createFormatButton('justifyFull', 'Justify (Ctrl+J)', alignJustify)}
       </div>
-      <div class="input-group link-controls">
-      ${createFormatButton('createLink', 'Create link (Ctrl+K)', faLink)}
-      ${createFormatButton('unlink', 'Unlink (Ctrl+D)', faUnlink)}
+      <div class="input-group link-controls" style="display: flex; align-items: stretch;">
+      ${createFormatButton('createLink', 'Create link (Ctrl+K)', link)}
+      ${createFormatButton('unlink', 'Unlink (Ctrl+D)', unlink)}
     </div>`;
     fBarContainer.innerHTML = fBarContainerHTML;
     newTextarea.classList.add('body-content');
@@ -260,9 +262,9 @@ const getCounterElement = (el: HTMLTextAreaElement) => {
     throwError({ err: error, msg: 'Error in getCounterElement:' });
   }
 };
-const createFormatButton = (dataFormat: string, title: string, icon: IconDefinition) =>
+const createFormatButton = (dataFormat: string, title: string, icon: string) =>
   `<button class="input-group-addon input-group-btn"
-                data-formatting-exec-command="${dataFormat}" tabindex="-1" title="${title}" type="button"><i class="fa ${icon.iconName}></i></button>`;
+                data-formatting-exec-command="${dataFormat}" tabindex="-1" title="${title}" type="button" style="max-width: 2rem;" >${icon}</button>`;
 const hide = (el: HTMLElement) => {
   el.style.display = 'none';
   el.style.visibility = 'hidden';
