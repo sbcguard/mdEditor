@@ -1,0 +1,8 @@
+.undoStack {
+  display: none !important;
+  visibility: hidden !important;
+}
+.redoStack {
+  display: none !important;
+  visibility: hidden !important;
+}

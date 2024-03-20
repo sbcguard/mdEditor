@@ -81,17 +81,6 @@
 //       await setBodyMaxLength(md_area);
 //       //Build md_editor controls
 //       await buildFormattingBar(parentContainer);
-//       //Style md_editor specific elements
-//       await buildStyles();
-//       //Init Counter
-//       await initCounter(md_area, body_max_length);
-//       body_div = document.querySelector('.body-content');
-//       // Capture shortcut keys
-//       body_div.addEventListener('keydown', self.captureShortcut);
-//       // Update the content on every input
-//       body_div.addEventListener('input', self.updateBodyContents);
-//       body_div.addEventListener('keyup', self.updateBodyContents);
-//       body_div.addEventListener('change', self.updateBodyContents);
 //       // Perform an update before the form is submitted
 //       md_area.form.addEventListener('submit', self.updateBodyContents);
 //       // Formatting bar
@@ -180,25 +169,7 @@
 //     try {
 //       const targElName = document.querySelector('[data-mdeditor="true"]').name;
 //       const styleEl = document.createElement('style');
-//       styleEl.innerHTML = `.formatting-bar {
-//     margin-bottom: 5px;
-//     display: flex;
-//     justify-content: space-evenly;
-// }
-// .${targElName} {
-//     background-color: #fff;
-//     border-radius: 4px;
-//     border-style: solid;
-//     border-width: 1px;
-//     border-color: #ccc;
-//     overflow: hidden;
-//     width: 100%;
-//     white-space: pre-wrap;
-// }
-// .body-content {
-// min-height: 250px;
-// background-color: white;
-// }
+//       styleEl.innerHTML = `
 // .counter-for-${targElName} {
 //     background-color: #E7E7E7;
 //     padding: 5px;

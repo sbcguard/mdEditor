@@ -1,6 +1,8 @@
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
+import postcss from 'rollup-plugin-postcss';
+import replace from '@rollup/plugin-replace';
 //import terser from '@rollup/plugin-terser';
 
 export default {
@@ -23,7 +25,8 @@ export default {
       sourcemap: false,
       globals: {
         // Specify global variable names for external modules
-        '@fortawesome/free-solid-svg-icons': 'freeSolidSvgIcons',
+        react: 'React',
+        'react-dom': 'ReactDOM',
       },
     },
   ],
@@ -31,7 +34,16 @@ export default {
     typescript(), // Handle TypeScript files
     resolve(), // Resolve module imports
     commonjs(), // Convert CommonJS modules to ES modules
+    postcss({
+      modules: true, // Enable CSS Modules
+      extract: true, // Extract CSS to a separate file
+      minimize: true, // Minify CSS
+      extensions: ['.css'], // Process CSS files
+    }),
+    replace({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    }),
     //terser(), // Optionally minify the output
   ],
-  external: ['@fortawesome/free-solid-svg-icons'], // Specify external modules to exclude from the bundle
+  external: [], // Specify external modules to exclude from the bundle
 };

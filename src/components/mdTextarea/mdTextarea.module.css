@@ -1,0 +1,20 @@
+.editor {
+  background-color: white;
+  min-height: 5rem;
+  margin-top: 0.25rem;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc;
+  overflow: hidden;
+  width: 100%;
+  white-space: pre-wrap;
+}
+.undoStack {
+  display: none !important;
+  visibility: hidden !important;
+}
+.redoStack {
+  display: none !important;
+  visibility: hidden !important;
+}

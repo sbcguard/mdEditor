@@ -1,12 +1,7 @@
 // mdEditor main.js
 import { MarkDownObject } from './types';
-import {
-  throwError,
-  captureShortcut,
-  executeFormatCommand,
-  setBodyMaxLength,
-  buildFormattingBar,
-} from './functions';
+import { throwError, captureShortcut, setBodyMaxLength } from './functions';
+import { buildEditor } from './components';
 export async function init(): Promise<void> {
   try {
     // Wait for the DOMContentLoaded event before executing further
@@ -40,14 +35,12 @@ export async function init(): Promise<void> {
         bodyLength: setBodyMaxLength(md_area),
       };
       //Build md_editor controls
-      buildFormattingBar(mdObj.parent, md_area);
-      //   //Style md_editor specific elements
-      //   await buildStyles();
-      //   //Init Counter
+      buildEditor(mdObj, md_area);
+      //Start capturing key events
+      mdObj.parent.addEventListener('keydown', captureShortcut);
+      //Init Counter
       //   await initCounter(md_area, body_max_length);
       //   body_div = document.querySelector('.body-content');
-      //   // Capture shortcut keys
-      //   body_div.addEventListener('keydown', self.captureShortcut);
       //   // Update the content on every input
       //   body_div.addEventListener('input', self.updateBodyContents);
       //   body_div.addEventListener('keyup', self.updateBodyContents);
