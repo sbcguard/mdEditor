@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ErrorProps, FormInputAndControlElements, SelectionType } from './types';
-import { shortcutKeys, allowedUrls, commandExec } from './store';
+import { shortcutKeys, allowedUrls, commandExec, undoStack, redoStack } from './store';
+import { undo } from './execCommand';
 export const throwError = ({ err, msg }: ErrorProps) => {
   // On any error, disable all forms to prevent bad emails from being sent
   const forms = document.querySelectorAll<HTMLFormElement>('form');
@@ -185,8 +186,10 @@ const updateClipboard = (ev: Event) => {
     const parent = ev.currentTarget as HTMLDivElement;
     const editor = parent.querySelector('div') as HTMLDivElement;
     const content = editor.innerHTML;
-    const currentState = { content, redo: false };
-    window.history.pushState(currentState, '');
+    undoStack.push(content);
+    redoStack.length = 0;
+    const prevState = undoStack.length > 1 ? undoStack[undoStack.length - 1] : null;
+    window.history.replaceState({ content: content, prevState: prevState }, '');
   } catch (error: any) {
     throw error;
   }
@@ -230,15 +233,15 @@ export const jsxToNode = (jsxElement: JSX.Element): Node => {
   const domNode = tempContainer.firstChild;
   if (domNode instanceof Element) {
     const { children, ...attributes } = jsxElement.props;
-    Object.keys(attributes).forEach((propName) => {
-      const propValue = attributes[propName];
-      if (propName.startsWith('on') && typeof propValue === 'function') {
-        const eventName = propName.substring(2).toLowerCase();
-        domNode.addEventListener(eventName, propValue);
-      } else {
-        domNode.setAttribute(propName, propValue);
-      }
-    });
+    // Object.keys(attributes).forEach((propName) => {
+    //   const propValue = attributes[propName];
+    //   if (propName.startsWith('on') && typeof propValue === 'function') {
+    //     const eventName = propName.substring(2).toLowerCase();
+    //     domNode.addEventListener(eventName, propValue);
+    //   } else {
+    //     domNode.setAttribute(propName, propValue);
+    //   }
+    // });
     return domNode;
   }
   throw new Error('Failed to convert JSX to DOM node');

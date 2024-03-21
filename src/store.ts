@@ -57,3 +57,5 @@ export const commandExec: commandObj = {
   unlink: unlink,
 };
 export const allowedUrls: string[] = ['*'];
+export const undoStack: string[] = [];
+export const redoStack: string[] = [];

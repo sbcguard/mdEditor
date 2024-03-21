@@ -1,4 +1,5 @@
 // Function to toggle bold
+import { undoStack, redoStack } from '../store';
 export const bold = () => {
   const selection = window.getSelection();
   if (selection && selection.rangeCount > 0) {
@@ -213,35 +214,84 @@ export const getBlockElement = (node: Node | null): HTMLElement | null => {
 };
 // Function to perform undo action
 export const undo = () => {
-  const selection = window.getSelection();
-  if (selection) {
-    if (window.history.state) {
-      const range = selection.getRangeAt(0);
-      const startContainer = range.startContainer as HTMLElement;
-      const container = startContainer.parentElement;
-      const prevState = window.history.state;
-      if (container && container.innerHTML !== '') {
-        console.log(container, prevState.content);
-        container.innerHTML = prevState.content;
-        window.history.replaceState({ content: container.innerHTML, redo: true }, '');
+  const editor = document.activeElement as HTMLDivElement;
+  if (editor && editor.contentEditable === 'true') {
+    if (undoStack.length > 0) {
+      const currentState = editor.innerHTML;
+      const newState = undoStack.pop() || '';
+      // Create a temporary element to parse the newState
+      const tempElement = document.createElement('div');
+      tempElement.innerHTML = newState;
+
+      // Find the deepest nested element and its deepest text node
+      let deepestElement: HTMLElement | null = tempElement;
+      let deepestTextNode: Node | null = null;
+
+      while (deepestElement.lastElementChild) {
+        deepestElement = deepestElement.lastElementChild as HTMLElement;
       }
+
+      // Check if the deepest element has a text node
+      if (deepestElement.childNodes.length === 1 && deepestElement.firstChild instanceof Text) {
+        deepestTextNode = deepestElement.firstChild;
+      }
+
+      // If the deepest element has a text node, undo by removing one character
+      if (deepestTextNode && deepestTextNode.textContent) {
+        const newTextContent = deepestTextNode.textContent.slice(0, -1);
+        deepestTextNode.textContent = newTextContent;
+      }
+
+      // Update the editor's innerHTML with the modified tempElement content
+      editor.innerHTML = tempElement.innerHTML;
+      redoStack.push(currentState);
+      // editor.innerHTML =
+      //   newState === currentState ? newState.substring(0, newState.length - 1) : newState;
     }
   }
 };
-
 // Function to perform redo action
 export const redo = () => {
-  const selection = window.getSelection();
-  if (selection) {
-    if (window.history.state && window.history.state.redo) {
-      const range = selection.getRangeAt(0);
-      const startContainer = range.startContainer as HTMLElement;
-      const container = startContainer.parentElement;
-      const nextState = window.history.state;
-      if (container) {
-        container.innerHTML = nextState.content;
-        window.history.replaceState({ content: container.innerHTML, redo: false }, '');
+  const editor = document.activeElement as HTMLDivElement;
+  if (editor && editor.contentEditable === 'true') {
+    if (redoStack.length > 0) {
+      const nextState = redoStack.pop() || '';
+      // editor.innerHTML = nextState || '';
+      // Create a temporary element to parse the nextState
+      const tempElement = document.createElement('div');
+      tempElement.innerHTML = nextState;
+
+      // Find the deepest nested element and its deepest text node
+      let deepestElement: HTMLElement | null = tempElement;
+      let deepestTextNode: Node | null = null;
+
+      while (deepestElement.lastElementChild) {
+        deepestElement = deepestElement.lastElementChild as HTMLElement;
       }
+
+      // Check if the deepest element has a text node
+      if (deepestElement.childNodes.length === 1 && deepestElement.firstChild instanceof Text) {
+        deepestTextNode = deepestElement.firstChild;
+      }
+
+      // If the deepest element has a text node, redo by adding one character
+      if (deepestTextNode && deepestTextNode.textContent) {
+        const newTextContent = deepestTextNode.textContent + ' ';
+        deepestTextNode.textContent = newTextContent;
+      }
+
+      // Update the editor's innerHTML with the modified tempElement content
+      editor.innerHTML = tempElement.innerHTML;
     }
+    // if (!undoStack.includes(editor.innerHTML)) {
+    undoStack.push(editor.innerHTML);
+    // }
   }
 };
+// const prevContent = editor.innerHTML
+// if (prevContent === '' && nextState === '') {
+//   undoStack.pop(); // Remove the empty redo state from undoStack
+// } else {
+//   undoStack.push(editor.innerHTML); // Push the new content to undoStack
+// }
+// nextState && undoStack.push(nextState);
