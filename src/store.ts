@@ -1,22 +1,22 @@
-import {
-  bold,
-  redo,
-  undo,
-  italic,
-  underline,
-  strikeThrough,
-  subscript,
-  superscript,
-  removeFormat,
-  outdent,
-  indent,
-  justifyCenter,
-  justifyFull,
-  justifyLeft,
-  justifyRight,
-  createLink,
-  unlink,
-} from './execCommand';
+// import {
+//   bold,
+//   redo,
+//   undo,
+//   italic,
+//   underline,
+//   strikeThrough,
+//   subscript,
+//   superscript,
+//   removeFormat,
+//   outdent,
+//   indent,
+//   justifyCenter,
+//   justifyFull,
+//   justifyLeft,
+//   justifyRight,
+//   createLink,
+//   unlink,
+// } from './execCommand';
 import { ShortcutKeys, commandObj } from './types';
 export const shortcutKeys: ShortcutKeys = {
   Z: 'undo',
@@ -37,25 +37,25 @@ export const shortcutKeys: ShortcutKeys = {
   K: 'createLink',
   D: 'unlink',
 };
-export const commandExec: commandObj = {
-  undo: undo,
-  redo: redo,
-  bold: bold,
-  italic: italic,
-  underline: underline,
-  strikeThrough: strikeThrough,
-  subscript: subscript,
-  superscript: superscript,
-  removeFormat: removeFormat,
-  outdent: outdent,
-  indent: indent,
-  justifyLeft: justifyLeft,
-  justifyCenter: justifyCenter,
-  justifyRight: justifyRight,
-  justifyFull: justifyFull,
-  createLink: createLink,
-  unlink: unlink,
-};
-export const allowedUrls: string[] = ['*'];
+// export const commandExec: commandObj = {
+//   undo: undo,
+//   redo: redo,
+//   bold: bold,
+//   italic: italic,
+//   underline: underline,
+//   strikeThrough: strikeThrough,
+//   subscript: subscript,
+//   superscript: superscript,
+//   removeFormat: removeFormat,
+//   outdent: outdent,
+//   indent: indent,
+//   justifyLeft: justifyLeft,
+//   justifyCenter: justifyCenter,
+//   justifyRight: justifyRight,
+//   justifyFull: justifyFull,
+//   createLink: createLink,
+//   unlink: unlink,
+// };
+export const allowedUrls: string[] = ['*']; // '*' is allow all urls
 export const undoStack: string[] = [];
 export const redoStack: string[] = [];

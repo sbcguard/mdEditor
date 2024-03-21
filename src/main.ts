@@ -38,32 +38,6 @@ export async function init(): Promise<void> {
       buildEditor(mdObj, md_area);
       //Start capturing key events
       mdObj.parent.addEventListener('keydown', captureShortcut);
-      //Init Counter
-      //   await initCounter(md_area, body_max_length);
-      //   body_div = document.querySelector('.body-content');
-      //   // Update the content on every input
-      //   body_div.addEventListener('input', self.updateBodyContents);
-      //   body_div.addEventListener('keyup', self.updateBodyContents);
-      //   body_div.addEventListener('change', self.updateBodyContents);
-      //   // Perform an update before the form is submitted
-      //   md_area.form.addEventListener('submit', self.updateBodyContents);
-      //   // Formatting bar
-      //   Array.from(
-      //     document.querySelectorAll('.formatting-bar button[data-formatting-exec-command]'),
-      //   ).forEach((el) => {
-      //     el.addEventListener('click', (e) => {
-      //       self.executeFormatCommand(e.currentTarget.getAttribute('data-formatting-exec-command'));
-      //     });
-      //   });
-      //   Array.from(
-      //     document.querySelectorAll('.formatting-bar select[data-formatting-exec-command]'),
-      //   ).forEach((el) => {
-      //     el.addEventListener('change', (e) => {
-      //       const { currentTarget: targ } = e;
-      //       const { value: checked } = targ.querySelector(':checked');
-      //       document.execCommand(target.getAttribute('data-formatting-exec-command'), false, checked);
-      //     });
-      //   });
     });
   } catch (error: any) {
     throw new Error(`${error.message}\r\nFailed to initialize mark down editor.`);

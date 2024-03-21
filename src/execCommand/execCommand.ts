@@ -1,12 +1,64 @@
-// Function to toggle bold
 import { undoStack, redoStack } from '../store';
+import { updateCount } from '../functions';
+
+/* Work in progress to replace depreciate document.execCommand*/
+const clearNullElements = (el: string) => {
+  const editors = Array.from(document.body.querySelectorAll('[class*="mdTextarea"]'));
+  editors.forEach((editor) => {
+    if (editor.innerHTML.includes(el)) {
+      const regex = new RegExp(el, 'gi');
+      editor.innerHTML = editor.innerHTML.replace(regex, '');
+    }
+  });
+};
+
+// Function to toggle bold
 export const bold = () => {
   const selection = window.getSelection();
-  if (selection && selection.rangeCount > 0) {
+  if (selection) {
     const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.fontWeight = range.toString().includes('bold') ? 'normal' : 'bold';
-    range.surroundContents(span);
+    const selectedContent = range.cloneContents();
+    const selectionCount = range.toString().length;
+    const strongElement = document.createElement('strong');
+    //clear empty <strong>
+    clearNullElements(strongElement.outerHTML);
+    console.log(range.startContainer.nodeName.toLowerCase() === 'strong');
+    if (selectionCount === 0 && range.startContainer.nodeName.toLowerCase() !== 'strong') {
+      const wholeText = range.startContainer.textContent;
+      strongElement.textContent = wholeText;
+      range.startContainer.parentNode?.replaceChild(strongElement, range.startContainer);
+      return;
+    }
+    if (selectionCount === 0 && range.startContainer.nodeName.toLowerCase() === 'strong') {
+      const tmpContainer = document.createElement('div');
+      tmpContainer.innerHTML = (range.startContainer as HTMLElement).innerHTML;
+      if (tmpContainer.firstChild) {
+        range.startContainer.parentElement?.replaceChild(
+          tmpContainer.firstChild,
+          range.startContainer,
+        );
+      }
+    }
+
+    // Check if the parent element of the selected content is <strong>
+    let parentElement = range.commonAncestorContainer.parentElement;
+    while (parentElement && parentElement.tagName.toLowerCase() !== 'strong') {
+      parentElement = parentElement.parentElement;
+    }
+    //console.log(parentElement, range.commonAncestorContainer);
+    if (parentElement && parentElement.tagName.toLowerCase() === 'strong') {
+      // Remove the <strong> element and insert its child nodes
+      const childNodes = Array.from(parentElement.childNodes);
+      //console.log(childNodes, parentElement.parentNode);
+      childNodes.forEach((node) => parentElement.parentNode?.insertBefore(node, parentElement));
+      parentElement.remove();
+      return;
+    }
+
+    // Wrap selected content with <strong> element
+    strongElement.appendChild(selectedContent);
+    range.deleteContents();
+    range.insertNode(strongElement);
   }
 };
 
@@ -15,9 +67,11 @@ export const italic = () => {
   const selection = window.getSelection();
   if (selection && selection.rangeCount > 0) {
     const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.fontStyle = range.toString().includes('italic') ? 'normal' : 'italic';
-    range.surroundContents(span);
+    const selectedText = range.toString();
+    const strong = document.createElement('strong');
+    strong.appendChild(document.createTextNode(selectedText));
+    range.deleteContents();
+    range.insertNode(strong);
   }
 };
 
@@ -245,8 +299,7 @@ export const undo = () => {
       // Update the editor's innerHTML with the modified tempElement content
       editor.innerHTML = tempElement.innerHTML;
       redoStack.push(currentState);
-      // editor.innerHTML =
-      //   newState === currentState ? newState.substring(0, newState.length - 1) : newState;
+      updateCount(editor);
     }
   }
 };
@@ -276,22 +329,16 @@ export const redo = () => {
 
       // If the deepest element has a text node, redo by adding one character
       if (deepestTextNode && deepestTextNode.textContent) {
-        const newTextContent = deepestTextNode.textContent + ' ';
+        const newTextContent = deepestTextNode.textContent;
         deepestTextNode.textContent = newTextContent;
       }
 
       // Update the editor's innerHTML with the modified tempElement content
       editor.innerHTML = tempElement.innerHTML;
+      updateCount(editor);
     }
-    // if (!undoStack.includes(editor.innerHTML)) {
-    undoStack.push(editor.innerHTML);
-    // }
+    if (!undoStack.includes(editor.innerHTML)) {
+      undoStack.push(editor.innerHTML);
+    }
   }
 };
-// const prevContent = editor.innerHTML
-// if (prevContent === '' && nextState === '') {
-//   undoStack.pop(); // Remove the empty redo state from undoStack
-// } else {
-//   undoStack.push(editor.innerHTML); // Push the new content to undoStack
-// }
-// nextState && undoStack.push(nextState);

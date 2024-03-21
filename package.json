@@ -46,6 +46,7 @@
     "react-dom": "^18.2.0",
     "react-svg": "^16.1.33",
     "rollup": "^4.13.0",
+    "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-postcss": "^4.0.2",
     "typescript": "^5.4.2"
   },

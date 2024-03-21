@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ErrorProps, FormInputAndControlElements, SelectionType } from './types';
-import { shortcutKeys, allowedUrls, commandExec, undoStack, redoStack } from './store';
-import { undo } from './execCommand';
+import { shortcutKeys, allowedUrls } from './store';
+import { createDialog } from './components';
+//import { undo } from './execCommand';
 export const throwError = ({ err, msg }: ErrorProps) => {
   // On any error, disable all forms to prevent bad emails from being sent
   const forms = document.querySelectorAll<HTMLFormElement>('form');
@@ -70,17 +71,11 @@ const executeFormatCommand = async (command: string) => {
           if (rangeCount > 0) {
             const dialogRange: Range = selection.getRangeAt(0);
             const urlLink = await createDialog();
-            if (urlLink && checkURL(urlLink)) {
-              if (urlLink.startsWith('https://')) {
-                selection.removeAllRanges();
-                selection.addRange(dialogRange);
-                commandExec[command](urlLink);
-                //document.execCommand('createLink', false, urlLink);
-              } else {
-                alert(`Link must begin with "https://"`);
-              }
-            } else {
-              alert(`Link must be to an allowed URL: \r\n${allowedUrls.join('\r\n')}`);
+            if (urlLink) {
+              selection.removeAllRanges();
+              selection.addRange(dialogRange);
+              //commandExec[command](urlLink);
+              document.execCommand('createLink', false, urlLink);
             }
           } else {
             alert(
@@ -89,8 +84,8 @@ const executeFormatCommand = async (command: string) => {
           }
         }
       } else {
-        commandExec[command]();
-        //document.execCommand(command, false, undefined);
+        //commandExec[command]();
+        document.execCommand(command, false, undefined);
       }
     }
   } catch (error: any) {
@@ -111,68 +106,9 @@ export const setBodyMaxLength = (el: HTMLTextAreaElement): number => {
   return 0;
 };
 
-const createDialog = async (): Promise<string> => {
-  try {
-    let returnValue = '';
-    const backdrop = document.createElement('div');
-    const dialog = document.createElement('dialog');
-
-    dialog.open = true;
-    dialog.innerHTML = `
-      <div class="md-dialog-container">
-        <p>Enter the URL of the link:</p>
-        <form>
-          <input type="url" value="https://" size="50" autofocus>
-          <button type="submit">Ok</button>
-          <button type="button">Cancel</button>
-        </form>
-      </div>
-    `;
-
-    const input = dialog.querySelector('input');
-    const submitButton = dialog.querySelector('button[type="submit"]');
-    const cancelButton = dialog.querySelector('button[type="button"]');
-
-    if (input && submitButton && cancelButton) {
-      input.addEventListener('input', () => {
-        returnValue = input.value;
-      });
-
-      const dialogClosed = new Promise<void>((resolve) => {
-        const handleClose = () => {
-          dialog.close(input.value);
-          resolve();
-        };
-
-        submitButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          handleClose();
-        });
-
-        cancelButton.addEventListener('click', (e) => {
-          e.preventDefault();
-          handleClose();
-        });
-      });
-
-      await dialogClosed;
-    } else {
-      throw new Error('Error initializing user input dialog');
-    }
-
-    backdrop.remove();
-    return returnValue;
-  } catch (error: any) {
-    throwError({ err: error, msg: 'Error in createDialog:' });
-  }
-  return '';
-};
-const checkURL = (url: string): boolean =>
-  allowedUrls.includes('*') ? true : allowedUrls.some((url) => url.includes(url));
-
 export const addEditorEvents = (el: Node) => {
   try {
-    el.addEventListener('input', updateClipboard);
+    //el.addEventListener('input', updateClipboard);
     el.addEventListener('input', updateCount);
     el.addEventListener('keypress', updateCount);
     el.addEventListener('change', updateCount);
@@ -181,23 +117,23 @@ export const addEditorEvents = (el: Node) => {
     throw error;
   }
 };
-const updateClipboard = (ev: Event) => {
-  try {
-    const parent = ev.currentTarget as HTMLDivElement;
-    const editor = parent.querySelector('div') as HTMLDivElement;
-    const content = editor.innerHTML;
-    undoStack.push(content);
-    redoStack.length = 0;
-    const prevState = undoStack.length > 1 ? undoStack[undoStack.length - 1] : null;
-    window.history.replaceState({ content: content, prevState: prevState }, '');
-  } catch (error: any) {
-    throw error;
-  }
-};
-const updateCount = (ev: Event) => {
+// const updateClipboard = (ev: Event) => {
+//   try {
+//     const parent = ev.currentTarget as HTMLDivElement;
+//     const editor = parent.querySelector('div') as HTMLDivElement;
+//     const content = editor.innerHTML;
+//     undoStack.push(content);
+//     redoStack.length = 0;
+//     const prevState = undoStack.length > 1 ? undoStack[undoStack.length - 1] : null;
+//     window.history.replaceState({ content: content, prevState: prevState }, '');
+//   } catch (error: any) {
+//     throw error;
+//   }
+// };
+export const updateCount = (ev: Event | HTMLDivElement) => {
   try {
     let maxAllowed = 10000;
-    const parent = ev.currentTarget as HTMLDivElement;
+    const parent = ev instanceof Event ? (ev.currentTarget as HTMLDivElement) : ev;
     const editor = parent.querySelector('div') as HTMLDivElement;
     const countSpan: HTMLSpanElement | null = parent.querySelector(
       `span[class="${editor.classList[0]}-counter"]`,
@@ -213,12 +149,13 @@ const updateCount = (ev: Event) => {
     }
     if (origInput) {
       if (editor.innerHTML.length > maxAllowed) {
-        ev.preventDefault();
+        ev instanceof Event && ev.preventDefault();
         origInput.value = editor.innerHTML.substring(0, maxAllowed - 1);
       } else {
         origInput.value = editor.innerHTML;
       }
     }
+    updateOriginalTextarea(editor.classList[0], editor);
   } catch (error: any) {
     throw error;
   }
@@ -245,4 +182,40 @@ export const jsxToNode = (jsxElement: JSX.Element): Node => {
     return domNode;
   }
   throw new Error('Failed to convert JSX to DOM node');
+};
+export const attachSubmitEvent = (
+  form: HTMLFormElement,
+  editor: HTMLDivElement,
+  el: HTMLTextAreaElement,
+) => {
+  try {
+    // Update textarea to the contents of the body div, replacing characters at code point 128 and above with HTML entities, and removing <br> inside other tags
+    form.addEventListener('submit', () => {
+      updateOriginalTextarea(el.name, editor);
+    });
+  } catch (error: any) {
+    throw error;
+  }
+};
+const updateOriginalTextarea = (name: string, editor: HTMLDivElement) => {
+  try {
+    const origInput = document.querySelector(`[name=${name}]`) as HTMLTextAreaElement;
+    origInput.value = editor.innerHTML
+      .replace(/\r?\n/g, '<br>') // Make newlines breaks
+      .replace(/[\u0080-\uFFFF]/g, (m) => {
+        return '&#' + m.charCodeAt(0) + ';';
+      }) // Replace with HTML entities
+      .replace(/<[^>]*(<br>[^>]*?)+>/gi, (m) => {
+        return m.replace(/<br>/gi, '');
+      }) // Remove <br> inside tags
+      .replace(/<[^>]*(<br\/>[^>]*?)+>/gi, (m) => {
+        return m.replace(/<br\/>/gi, '');
+      }); // Remove <br/> inside tags
+    // Show character counter
+    if (origInput.value.trim() === '<br>') origInput.value = '';
+    if (editor.innerHTML.trim() === '<br>') editor.innerHTML = '';
+    if (editor.textContent?.trim() === '') editor.innerHTML = '';
+  } catch (error: any) {
+    throw error;
+  }
 };
