@@ -5,6 +5,7 @@ import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
 import del from 'rollup-plugin-delete';
 import terser from '@rollup/plugin-terser';
+import cleanup from 'rollup-plugin-cleanup';
 
 export default {
   input: 'src/index.ts', // Entry point of your TypeScript code
@@ -72,11 +73,16 @@ export default {
       extensions: ['.css'], // Process CSS files
     }),
     replace({
-      preventAssignmentErrors: true, // Disable
+      preventAssignment: true, // Disable
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     }),
     del({
       targets: ['dist/**/*.d.ts'], //excludes type definition files from production build
+    }),
+    cleanup({
+      comments: 'none', // Remove all comments
+      maxEmptyLines: 0,
+      extensions: ['.js', '.ts', '.tsx'],
     }),
   ],
   external: [], // Specify external modules to exclude from the bundle

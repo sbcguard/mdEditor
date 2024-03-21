@@ -3,14 +3,13 @@ import { MarkDownObject } from '../../src/types';
 import {
   hide,
   throwError,
-  jsxToNode,
   addEditorEvents,
   addCommandEvents,
   attachSubmitEvent,
 } from '../functions';
+import { jsxToNode } from '../jsxToNode';
 import { formatBarContainer } from './formatBar';
 import { mdTextarea } from './mdTextarea';
-import styles from './buildEditor.module.css';
 export const buildEditor = (obj: MarkDownObject, el: HTMLTextAreaElement) => {
   try {
     if (!parent) throw new Error('Failed to init format bar, no container element provided.');

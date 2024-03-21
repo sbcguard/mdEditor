@@ -1,5 +1,5 @@
 import React from 'react';
-import { jsxToNode } from '../../functions';
+import { jsxToNode } from '../../jsxToNode';
 import { allowedUrls } from '../../store';
 import styles from './urlDialog.module.css';
 export const createDialog = async (): Promise<string> => {

@@ -1,8 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import { ErrorProps, FormInputAndControlElements, SelectionType } from './types';
-import { shortcutKeys, allowedUrls } from './store';
-import { createDialog } from './components';
+import { shortcutKeys } from './store';
+import { createDialog } from './components/dialogBox';
 //import { undo } from './execCommand';
 export const throwError = ({ err, msg }: ErrorProps) => {
   // On any error, disable all forms to prevent bad emails from being sent
@@ -164,25 +162,7 @@ export const hide = (el: HTMLElement) => {
   el.style.display = 'none';
   el.style.visibility = 'hidden';
 };
-export const jsxToNode = (jsxElement: JSX.Element): Node => {
-  const tempContainer = document.createElement('div');
-  ReactDOM.render(jsxElement, tempContainer);
-  const domNode = tempContainer.firstChild;
-  if (domNode instanceof Element) {
-    const { children, ...attributes } = jsxElement.props;
-    // Object.keys(attributes).forEach((propName) => {
-    //   const propValue = attributes[propName];
-    //   if (propName.startsWith('on') && typeof propValue === 'function') {
-    //     const eventName = propName.substring(2).toLowerCase();
-    //     domNode.addEventListener(eventName, propValue);
-    //   } else {
-    //     domNode.setAttribute(propName, propValue);
-    //   }
-    // });
-    return domNode;
-  }
-  throw new Error('Failed to convert JSX to DOM node');
-};
+
 export const attachSubmitEvent = (
   form: HTMLFormElement,
   editor: HTMLDivElement,
