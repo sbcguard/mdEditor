@@ -1,4 +1,4 @@
-import React, { FormEventHandler } from 'react';
+import React from 'react';
 import styles from './mdTextarea.module.css';
 
 export const mdTextarea = (name: string, bodyLength: number) => (

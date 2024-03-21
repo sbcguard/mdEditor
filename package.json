@@ -31,7 +31,6 @@
   },
   "homepage": "https://github.com/sbcguard/mdEditor#readme",
   "devDependencies": {
-    "@fortawesome/fontawesome-free": "^6.5.1",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.5",
@@ -56,8 +55,5 @@
     "printWidth": 100,
     "semi": true,
     "singleQuote": true
-  },
-  "dependencies": {
-    "@fortawesome/free-solid-svg-icons": "^6.5.1"
   }
 }
