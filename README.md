@@ -1,6 +1,6 @@
 # Simple Markdown Editor
 
-mdEditor is a Markdown editor built using React and Redux.
+mdEditor is a Markdown editor built using JSX elements and works with native html features.
 
 ## Table of Contents
 
