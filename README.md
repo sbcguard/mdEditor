@@ -25,7 +25,7 @@ git clone https://github.com/sbcguard/mdEditor.git
 npm run build
 ```
 
-4. Utilize the csj, esm, or umd modules at a page level by placing a script tag in the <head> tag of the page. Utilize the provided styles with a <link> tag.
+4. Utilize the csj, esm, or umd modules at a page level by placing a script tag in the head tag of the page. Utilize the provided styles with a link tag.
 
 ```html
 <script type="text/javascript" src="path/to/mdEditor.js"></script>
