@@ -1,6 +1,7 @@
 # Simple Markdown Editor
 
 mdEditor is a Markdown editor built using JSX elements and works with native html features.
+Currently using 'document.execCommand' for executing formatting commands. This will be replaced in the next major release to since execCommand is deprecated.
 
 ## Table of Contents
 
