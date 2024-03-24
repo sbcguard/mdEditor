@@ -836,7 +836,7 @@
                     resolve();
                 }
             });
-            const md_areas = document.querySelectorAll('[data-mdeditor="true"]');
+            const md_areas = document.querySelectorAll('[data-mdeditor]');
             if (!md_areas)
                 return;
             if (!Array.from(md_areas).every((el) => el.tagName.toLowerCase() === 'textarea')) {

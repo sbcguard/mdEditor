@@ -14,8 +14,7 @@ export async function init(): Promise<void> {
     });
 
     //Append After form element
-    const md_areas: NodeListOf<HTMLTextAreaElement> =
-      document.querySelectorAll('[data-mdeditor="true"]');
+    const md_areas: NodeListOf<HTMLTextAreaElement> = document.querySelectorAll('[data-mdeditor]');
     //Check for dataset attribute that triggers initialization on the textarea
     if (!md_areas) return;
     //Check that all marked elements are textarea elements
